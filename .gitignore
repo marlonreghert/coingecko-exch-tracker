@@ -1,0 +1,52 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.so
+
+# Virtual environment
+venv/
+env/
+
+# Python-specific logs
+*.log
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# Data files
+data/processed/
+data/raw/
+
+# Environment variables
+.env
+
+# Docker
+*.pid
+*.tar
+docker-compose.override.yml
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
+*.bak
+*.orig
+
+# Test results
+htmlcov/
+.coverage
+.tox/
+.cache/
+nosetests.xml
+coverage.xml
+*.cover
+
+# Editor-specific files
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
