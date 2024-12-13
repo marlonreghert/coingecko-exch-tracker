@@ -1,6 +1,7 @@
 from src.utils.coingecko_tickers_utils import get_coingecko_id, get_vs_currency
 from src.services.coingecko.coingecko_data_fetcher_limits import CoingeckoDataFetcherLimits
 from datetime import datetime
+import logging
 
 HISTORICAL_VOLUME_DATE_FORMAT = '%Y-%m-%d'
 
@@ -15,6 +16,8 @@ class CoingeckoDataFetcher:
     def __init__(self, coingecko_api, limits: CoingeckoDataFetcherLimits):
         self.coingecko_api = coingecko_api
         self.limits = limits
+        self.logger = logging.getLogger(self.__class__.__name__)
+
 
     def fetch_exchanges_with_similar_trades(self, bitso_markets):
         exchanges = self.coingecko_api.fetch_exchanges()
@@ -23,7 +26,7 @@ class CoingeckoDataFetcher:
         exchanges_lookup_count = 0
         for exchange in exchanges:
             if exchanges_lookup_count >= self.limits.exchanges_to_lookup_limit:
-                print("[CoingeckoDataFetcher] Reached the limit of exchanges to lookup")
+                self.logger.info("[CoingeckoDataFetcher] Reached the limit of exchanges to lookup")
                 break
 
             markets = self.coingecko_api.fetch_markets(exchange["id"]).get("tickers", [])
@@ -54,7 +57,7 @@ class CoingeckoDataFetcher:
                     "trust_score_rank": exchange.get("trust_score_rank"),
                 })       
                 if len(similar_exchanges) >= self.limits.exchanges_with_similar_trades_limit:
-                    print("[CoingeckoDataFetcher] Reached the limit of exchanges with similar trades necessary")
+                    self.logger.info("[CoingeckoDataFetcher] Reached the limit of exchanges with similar trades necessary")
                     break
 
         return (similar_exchanges, \
@@ -71,7 +74,7 @@ class CoingeckoDataFetcher:
             markets_processed.add(market_id)
 
             # Map market into Coingecko accepted vs currency id 
-            print("Market: " + str(market_id))
+            self.logger.info("Market: " + str(market_id))
             base, target = market_id.split('_')
 
             data = self.coingecko_api.fetch_historical_volume( \
@@ -109,8 +112,8 @@ class CoingeckoDataFetcher:
                     "date": today_date,
                     "volume_btc": total_volume_btc
                 })
-                print(f"Fetched volume for {exchange_id}: {total_volume_btc:.12f} BTC")
+                self.logger.info(f"Fetched volume for {exchange_id}: {total_volume_btc:.12f} BTC")
             except Exception as e:
-                print(f"Failed to fetch data for {exchange_id}: {e}")
+                self.logger.error(f"Failed to fetch data for {exchange_id}: {e}")
 
         return volume_table    

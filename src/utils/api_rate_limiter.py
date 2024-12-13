@@ -1,10 +1,13 @@
 from ratelimit import limits, sleep_and_retry
 import time
+import logging
 
 
 class APIRateLimiter:
     def __init__(self, max_retries=3):
         self.max_retries = max_retries
+        self.logger = logging.getLogger(self.__class__.__name__)
+
 
     def call_api(self, api_call_lambda):
         """
@@ -17,7 +20,7 @@ class APIRateLimiter:
         retries = 0
 
         while retries < self.max_retries:
-            print(f"[APIRateLimiter] attempt {retries+1}/{self.max_retries}")
+            self.logger.info(f"[APIRateLimiter] attempt {retries+1}/{self.max_retries}")
             response = api_call_lambda()
 
             # Check if the call was successful
@@ -28,12 +31,16 @@ class APIRateLimiter:
             # Check for throttling
             if response.status_code == 429:  # Too Many Requests
                 retry_after = int(response.headers.get("Retry-After", 1))  # Default to 1 second if header missing
-                print(f"[APIRateLimiter] Throttled. Retrying after {retry_after} seconds...")
+                self.logger.info(f"[APIRateLimiter] Throttled. Retrying after {retry_after} seconds...")
                 time.sleep(retry_after)
                 retries += 1
             else:
                 # If not a throttling error, break and raise
-                raise Exception(f"API call failed with status code {response.status_code}: {response.text}")
+                api_failure_error_message = f"API call failed with status code {response.status_code}: {response.text}"
+                self.logger.error(api_failure_error_message)
+                raise Exception(api_failure_error_message)
+
 
         # Raise an exception if max retries are reached
+        self.logger.error("Maximum retries reached - raising exception (Could not fetch data)")
         raise Exception("Maximum retries reached. Could not fetch data.")

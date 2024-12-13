@@ -2,6 +2,7 @@ import requests
 from datetime import datetime
 from ratelimit import limits, sleep_and_retry
 from src.utils.api_rate_limiter import APIRateLimiter
+import logging
 
 # Base URL for the CoinGecko API
 BASE_ROUTE = "https://api.coingecko.com/api/v3"
@@ -28,6 +29,7 @@ class CoingeckoAPI:
 
         :param rate_limiter_retries: Number of retries for API calls before raising an exception.
         """
+        self.logger = logging.getLogger(self.__class__.__name__)
         self.APIRateLimiter = APIRateLimiter(rate_limiter_retries)  # Initialize the rate limiter with specified retries
             
     def fetch_exchanges(self):
@@ -111,5 +113,5 @@ class CoingeckoAPI:
         :return: A Response object from the CoinGecko API.
         """
         url = str.format(FETCH_EXCHANGE_VOLUME_BY_ID_ROUTE, exchange_id=exchange_id, days=days)
-        print("Fetching exchange volume chart from:", url)  # Debug log for the API URL
+        self.logger.info("Fetching exchange volume chart from:", url)  # Debug log for the API URL
         return requests.get(url)
