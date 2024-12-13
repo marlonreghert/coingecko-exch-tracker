@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  localstack:
+    image: localstack/localstack:latest
+    container_name: localstack_container
+    environment:
+      - SERVICES=s3
+      - DEBUG=1
+      - DATA_DIR=/data
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test      
+    ports:
+      - "4566:4566" # LocalStack Gateway port
+      - "4572:4572" # S3 service port
+    volumes:
+      - "./localstack/data:/data" # Changed mount path to avoid conflicts
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./aws:/etc/localstack/init/ready.d"
+
+  python_app:
+    build:
+      context: . # Current directory as build context
+      dockerfile: Dockerfile
+    container_name: python_app_container
+    environment:
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_REGION=us-east-1
+      - S3_ENDPOINT=http://localstack:4566
+      - AWS_BUCKET=exchtracker
+    depends_on:
+      - localstack
+    volumes:
+      - ".:/app" # Mount current directory into container
+    command: sh -c "cron && tail -f /var/log/cron.log"

@@ -21,7 +21,7 @@ class TestTableUpdater(unittest.TestCase):
         args.coingecko_retries = 3
         args.exchanges_with_similar_trades_limit = 2
         args.exchanges_to_lookup_limit = 5
-        args.skip_s3_upload = True
+        args.write_to_s3 = False
 
         # Set up mocked dependencies
         MockBitsoAPI.return_value.fetch_markets.return_value = [("BTC", "USD")]
@@ -70,7 +70,7 @@ class TestTableUpdater(unittest.TestCase):
         coingecko_retries=3,
         exchanges_with_similar_trades_limit=2,
         exchanges_to_lookup_limit=5,
-        skip_s3_upload=True
+        write_to_s3=False
     ))
     def test_parse_args(self, mock_parse_args):
         # Test that parse_args correctly parses command-line arguments
@@ -78,7 +78,7 @@ class TestTableUpdater(unittest.TestCase):
         self.assertEqual(args.coingecko_retries, 3)
         self.assertEqual(args.exchanges_with_similar_trades_limit, 2)
         self.assertEqual(args.exchanges_to_lookup_limit, 5)
-        self.assertEqual(args.skip_s3_upload, True)
+        self.assertEqual(args.write_to_s3, False)
 
 if __name__ == "__main__":
     unittest.main()
