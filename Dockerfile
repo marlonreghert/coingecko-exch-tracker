@@ -25,9 +25,7 @@ RUN echo "AWS_BUCKET=exchtracker" >> /etc/environment && \
     echo "AWS_SECRET_ACCESS_KEY=test" >> /etc/environment && \
     echo "AWS_REGION=us-east-1" >> /etc/environment && \
     echo "S3_ENDPOINT=http://localstack:4566" >> /etc/environment && \
-    echo "*/1 * * * * . /etc/environment; PYTHONPATH=/app /usr/local/bin/python3 -m src.main --write_to_s3 >> /var/log/cron.log 2>&1" > /etc/cron.d/table_updater_cron
-
-# RUN echo "*/1 * * * * PYTHONPATH=/app /usr/local/bin/python3  -m src.table_updater --write_to_s3 >> /var/log/cron.log 2>&1" > /etc/cron.d/table_updater_cron
+    echo "0 2 * * * . /etc/environment; PYTHONPATH=/app /usr/local/bin/python3 -m src.main --write_to_s3 >> /var/log/cron.log 2>&1" > /etc/cron.d/table_updater_cron
 
 # Set permissions and apply cron job
 RUN chmod 0644 /etc/cron.d/table_updater_cron && crontab /etc/cron.d/table_updater_cron
