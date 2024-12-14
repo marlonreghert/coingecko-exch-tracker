@@ -1,11 +1,11 @@
 import unittest
 from unittest.mock import Mock, patch
-from src.utils.api_rate_limiter import APIRateLimiter
+from src.utils.api_rate_limiter import HTTPRateLimiter
 
 
 class TestAPIRateLimiter(unittest.TestCase):
     def setUp(self):
-        self.rate_limiter = APIRateLimiter(max_retries=3)
+        self.rate_limiter = HTTPRateLimiter(max_retries=3)
 
     @patch("time.sleep", return_value=None)  # Avoid delays
     def test_successful_call(self, _):

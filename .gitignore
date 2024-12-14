@@ -50,3 +50,6 @@ coverage.xml
 .vscode/
 *.sublime-workspace
 *.sublime-project
+
+# Data output folder
+output/

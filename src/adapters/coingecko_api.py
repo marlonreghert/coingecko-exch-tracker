@@ -1,7 +1,7 @@
 import requests
 from datetime import datetime
 from ratelimit import limits, sleep_and_retry
-from src.utils.api_rate_limiter import APIRateLimiter
+from src.utils.api_rate_limiter import HTTPRateLimiter
 import logging
 
 # Base URL for the CoinGecko API
@@ -30,7 +30,7 @@ class CoingeckoAPI:
         :param rate_limiter_retries: Number of retries for API calls before raising an exception.
         """
         self.logger = logging.getLogger(self.__class__.__name__)
-        self.APIRateLimiter = APIRateLimiter(rate_limiter_retries)  # Initialize the rate limiter with specified retries
+        self.http_rate_limiter = HTTPRateLimiter(rate_limiter_retries)  # Initialize the rate limiter with specified retries
             
     def fetch_exchanges(self):
         """
@@ -38,7 +38,7 @@ class CoingeckoAPI:
 
         :return: A JSON object containing exchange information.
         """
-        return self.APIRateLimiter.call_api(lambda: self._fetch_exchanges()).json()
+        return self.http_rate_limiter.call_api(lambda: self._fetch_exchanges()).json()
     
     def _fetch_exchanges(self):
         """
@@ -56,7 +56,7 @@ class CoingeckoAPI:
         :param exchange_id: The ID of the exchange.
         :return: A JSON object containing market ticker information.
         """
-        return self.APIRateLimiter.call_api(lambda: self._fetch_markets(exchange_id)).json()
+        return self.http_rate_limiter.call_api(lambda: self._fetch_markets(exchange_id)).json()
 
     def _fetch_markets(self, exchange_id):
         """
@@ -77,7 +77,7 @@ class CoingeckoAPI:
         :param target_vs_currency: The currency against which the volume is measured.
         :return: A JSON object containing historical volume data.
         """
-        return self.APIRateLimiter.call_api(lambda: self._fetch_historical_volume(base_coin_id, target_vs_currency)).json()
+        return self.http_rate_limiter.call_api(lambda: self._fetch_historical_volume(base_coin_id, target_vs_currency)).json()
     
     def _fetch_historical_volume(self, base_coin_id, target_vs_currency):
         """
@@ -102,7 +102,7 @@ class CoingeckoAPI:
         :param days: Number of days for which to fetch the volume chart.
         :return: A JSON object containing volume chart data.
         """
-        return self.APIRateLimiter.call_api(lambda: self._fetch_exchange_volume_chart(exchange_id, days)).json()
+        return self.http_rate_limiter.call_api(lambda: self._fetch_exchange_volume_chart(exchange_id, days)).json()
     
     def _fetch_exchange_volume_chart(self, exchange_id, days=30):
         """
@@ -113,5 +113,5 @@ class CoingeckoAPI:
         :return: A Response object from the CoinGecko API.
         """
         url = str.format(FETCH_EXCHANGE_VOLUME_BY_ID_ROUTE, exchange_id=exchange_id, days=days)
-        self.logger.info("Fetching exchange volume chart from:", url)  # Debug log for the API URL
+        self.logger.info(f"Fetching exchange volume chart from: {url}")  # Debug log for the API URL
         return requests.get(url)

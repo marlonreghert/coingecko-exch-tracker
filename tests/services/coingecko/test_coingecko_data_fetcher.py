@@ -1,8 +1,8 @@
 import unittest
 from unittest.mock import Mock, patch
 from datetime import datetime
-from src.services.coingecko.coingecko_data_fetcher import CoingeckoDataFetcher
-from src.services.coingecko.coingecko_data_fetcher_limits import CoingeckoDataFetcherLimits
+from src.core.coingecko.coingecko_data_analyzer import CoingeckoDataAnalyzer
+from src.core.coingecko.coingecko_data_fetcher_limits import CoingeckoDataFetcherLimits
 
 
 class TestCoingeckoDataFetcher(unittest.TestCase):
@@ -13,7 +13,7 @@ class TestCoingeckoDataFetcher(unittest.TestCase):
             exchanges_to_lookup_limit=5,
             exchanges_with_similar_trades_limit=3
         )
-        self.data_fetcher = CoingeckoDataFetcher(self.coingecko_api, self.limits)
+        self.data_fetcher = CoingeckoDataAnalyzer(self.coingecko_api, self.limits)
 
     @patch("src.utils.coingecko_tickers_utils.get_coingecko_id", return_value="mock_base_id")
     @patch("src.utils.coingecko_tickers_utils.get_vs_currency", return_value="mock_target_id")

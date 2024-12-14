@@ -1,9 +1,9 @@
 from ratelimit import limits, sleep_and_retry
+from src.constants.constants import RATE_LIMITER_DEFAULT_WAIT_TIME_SECONDS
 import time
 import logging
 
-
-class APIRateLimiter:
+class HTTPRateLimiter:
     def __init__(self, max_retries=3):
         self.max_retries = max_retries
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -30,7 +30,7 @@ class APIRateLimiter:
 
             # Check for throttling
             if response.status_code == 429:  # Too Many Requests
-                retry_after = int(response.headers.get("Retry-After", 1))  # Default to 1 second if header missing
+                retry_after = int(response.headers.get("Retry-After", RATE_LIMITER_DEFAULT_WAIT_TIME_SECONDS))  # Default to 1 second if header missing
                 self.logger.info(f"[APIRateLimiter] Throttled. Retrying after {retry_after} seconds...")
                 time.sleep(retry_after)
                 retries += 1

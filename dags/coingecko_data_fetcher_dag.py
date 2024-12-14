@@ -1,10 +1,10 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta
-from src.services.coingecko.coingecko_data_fetcher import CoingeckoDataFetcher
-from src.services.coingecko.coingecko_data_fetcher_limits import CoingeckoDataFetcherLimits
-from src.api.coingecko_api import CoingeckoAPI
-from src.api.bitso import BitsoAPI
+from src.core.coingecko.coingecko_data_analyzer import CoingeckoDataAnalyzer
+from src.core.coingecko.coingecko_data_fetcher_limits import CoingeckoDataFetcherLimits
+from src.external_apis.coingecko_api import CoingeckoAPI
+from src.adapters.bitso_api import BitsoAPI
 from s3.s3_handler import S3Handler
 import os
 import pandas as pd
@@ -24,7 +24,7 @@ def fetch_coingecko_data():
 
     # Initialize dependencies
     coingecko_api = CoingeckoAPI(rate_limiter_retries=args["coingecko_retries"])
-    coingecko_data_fetcher = CoingeckoDataFetcher(
+    coingecko_data_fetcher = CoingeckoDataAnalyzer(
         coingecko_api,
         CoingeckoDataFetcherLimits(
             args["exchanges_with_similar_trades_limit"],

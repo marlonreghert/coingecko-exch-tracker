@@ -1,11 +1,11 @@
-from src.utils.coingecko_tickers_utils import get_coingecko_id, get_vs_currency
-from src.services.coingecko.coingecko_data_fetcher_limits import CoingeckoDataFetcherLimits
+from src.core.coingecko.coingecko_tickers_utils import get_coingecko_id, get_vs_currency
+from src.core.coingecko.coingecko_data_fetcher_limits import CoingeckoDataFetcherLimits
 from datetime import datetime
 import logging
 
 HISTORICAL_VOLUME_DATE_FORMAT = '%Y-%m-%d'
 
-class CoingeckoDataFetcher:
+class CoingeckoDataAnalyzer:
     '''
         Fetches data from Coingecko API as dataframes.
         Accepts limits for the amount of data fetched
@@ -24,9 +24,10 @@ class CoingeckoDataFetcher:
         shared_markets = []
         similar_exchanges = []
         exchanges_lookup_count = 0
+
         for exchange in exchanges:
             if exchanges_lookup_count >= self.limits.exchanges_to_lookup_limit:
-                self.logger.info("[CoingeckoDataFetcher] Reached the limit of exchanges to lookup")
+                self.logger.info("Reached the limit of exchanges to lookup")
                 break
 
             markets = self.coingecko_api.fetch_markets(exchange["id"]).get("tickers", [])
@@ -57,7 +58,7 @@ class CoingeckoDataFetcher:
                     "trust_score_rank": exchange.get("trust_score_rank"),
                 })       
                 if len(similar_exchanges) >= self.limits.exchanges_with_similar_trades_limit:
-                    self.logger.info("[CoingeckoDataFetcher] Reached the limit of exchanges with similar trades necessary")
+                    self.logger.info("Reached the limit of exchanges with similar trades necessary")
                     break
 
         return (similar_exchanges, \
@@ -93,7 +94,6 @@ class CoingeckoDataFetcher:
                 
         return historical_volume
     
-    # total_volume_btc = sum(point[1] for point in data)
     def fetch_exchange_trade_volume(self, exchanges, days):
         today_date = datetime.utcnow().strftime(HISTORICAL_VOLUME_DATE_FORMAT)
         volume_table = []
