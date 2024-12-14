@@ -9,6 +9,7 @@ WRITE_TO_S3_DEFAULT = True
 
 # Analyzer constants
 HISTORICAL_DATA_LOOKBACK_DAYS_DEFAULT = 30
+HISTORICAL_VOLUME_DATE_FORMAT = '%Y-%m-%d'
 
 # Logging constants
 LOGGING_DEFAULT_LEVEL = "info"

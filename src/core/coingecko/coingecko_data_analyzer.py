@@ -1,9 +1,8 @@
 from src.core.coingecko.coingecko_tickers_utils import get_coingecko_id, get_vs_currency
 from src.core.coingecko.coingecko_data_fetcher_limits import CoingeckoDataFetcherLimits
+from src.constants.constants import HISTORICAL_VOLUME_DATE_FORMAT
 from datetime import datetime
 import logging
-
-HISTORICAL_VOLUME_DATE_FORMAT = '%Y-%m-%d'
 
 class CoingeckoSimilarExchangesDataAnalyzer:
     '''
