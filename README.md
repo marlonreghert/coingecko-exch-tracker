@@ -20,55 +20,63 @@ ExchTracker is a Python-based data pipeline that leverages the CoinGecko API to 
 
 ---
 
-## **Project Structure**
-```
-src/
-├── adapters/                 # Adapters for external APIs (e.g., S3, Bitso, CoinGecko)
-├── config/                   # Configuration classes and utilities
-├── constants/                # Application constants
-├── core/                     # Core pipeline and analysis logic
-├── di/                       # Dependency injection container
-├── utils/                    # Utility classes and functions
-tests/                        # Unit tests for all modules
-```
-
----
-
 ## **Requirements**
 - Python 3.9+
 - Docker & Docker Compose
+- Docker Daemon running (required for LocalStack)
 - AWS CLI (optional for interacting with S3 directly)
 
 ---
 
 ## **Setup**
 
-### 1. **Clone the Repository**
+### **1. Running with Docker Compose**
+
+Start the application and its dependencies (LocalStack) using Docker Compose:
 ```bash
-git clone <repository-url>
-cd exchtracker
+make up
 ```
 
-### 2. **Install Python Dependencies**
+To view logs:
+```bash
+make logs
+```
+
+To stop and clean up containers:
+```bash
+make down
+```
+
+### **2. Accessing the LocalStack Web App**
+LocalStack provides a web UI for exploring the S3 service and inspecting files. After starting the containers, open your browser and navigate to:
+```
+http://localhost:4566/_localstack
+```
+
+From here, you can inspect and manage the S3 folders and files.
+
+### **3. Running the Application Locally**
+
+#### **Install Dependencies**
 Create and activate a virtual environment:
 ```bash
 python -m venv venv
 source venv/bin/activate
 ```
 
-Install dependencies:
+Install the required Python dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. **Run Docker Containers**
-Start the LocalStack (S3) and Python app containers:
+#### **Run the Pipeline**
+Run the pipeline locally with default configurations:
 ```bash
-make up
+make run-local
 ```
 
-### 4. **Run Tests**
-To ensure everything is working, run the tests:
+#### **Run Tests**
+Run all unit tests locally:
 ```bash
 make tests
 ```
@@ -77,20 +85,8 @@ make tests
 
 ## **Usage**
 
-### **Running the Pipeline Locally**
-Run the main script with default settings:
-```bash
-make run-local
-```
-
-### **Running the Pipeline in Docker**
-```bash
-make run-docker
-```
-
-### **Custom Configuration**
-
-#### **Using Command-Line Arguments**
+### **Command-Line Arguments**
+You can configure the pipeline directly using command-line arguments:
 ```bash
 python src/main.py \
     --rate_limiter_max_retries 5 \
@@ -101,7 +97,7 @@ python src/main.py \
     --write_to_s3
 ```
 
-#### **Using a Config File**
+### **Using a Config File**
 Create a JSON configuration file:
 ```json
 {
@@ -122,7 +118,8 @@ python src/main.py --config path/to/config.json
 ---
 
 ## **Environment Variables**
-The project uses the following environment variables:
+
+The following environment variables are used for the Docker-based setup:
 
 | Variable              | Description                                | Default Value       |
 |-----------------------|--------------------------------------------|---------------------|
@@ -136,24 +133,31 @@ The project uses the following environment variables:
 
 ## **Makefile Commands**
 
-| Command       | Description                                     |
-|---------------|-------------------------------------------------|
-| `make build`  | Build Docker containers                        |
-| `make up`     | Start Docker containers                        |
-| `make down`   | Stop and remove Docker containers              |
-| `make logs`   | View logs from Docker containers               |
-| `make tests`  | Run all unit tests                             |
-| `make run-local` | Run the pipeline locally                     |
-| `make run-docker` | Run the pipeline in the Docker container    |
-| `make clean`  | Remove all Docker containers and volumes       |
+| Command           | Description                                     |
+|-------------------|-------------------------------------------------|
+| `make build`      | Build Docker containers                        |
+| `make up`         | Start Docker containers                        |
+| `make down`       | Stop and remove Docker containers              |
+| `make logs`       | View logs from Docker containers               |
+| `make tests`      | Run all unit tests                             |
+| `make run-local`  | Run the pipeline locally                       |
+| `make run-docker` | Run the pipeline in the Docker container        |
+| `make clean`      | Remove all Docker containers and volumes       |
 
 ---
 
 ## **Tests**
-The project includes comprehensive unit tests for all modules. Run the tests locally:
+
+Run all unit tests:
 ```bash
 make tests
 ```
+
+Test coverage includes:
+- Core pipeline logic
+- Retry mechanisms
+- Analysis and export functions
+- Integration with LocalStack for S3 functionality
 
 ---
 
@@ -166,13 +170,15 @@ make tests
 ---
 
 ## **License**
+
 This project is licensed under the MIT License.
 
 ---
 
 ## **Contact**
+
 For any issues or suggestions, please reach out to [your-email@example.com].
 
 ---
 
-This `README.md` provides clear instructions for setup, usage, and understanding the project's design and functionality, making it developer-friendly and professional.
+This `README.md` is well-organized and includes clear instructions for both Docker-based and local setups, emphasizing the LocalStack web app for S3 exploration and the need for Docker Daemon to be running.
