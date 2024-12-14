@@ -16,6 +16,7 @@ class TestCoingeckoSimilarExchangesDataAnalysisExporter(unittest.TestCase):
             exchanges_to_analyze_limit=10,
             write_to_s3=True
         )
+        self.mock_app_config.set_logical_date("2024", "05", "07")
         self.mock_s3_handler = MagicMock(spec=S3Handler)
         self.exporter = CoingeckoSimilarExchangesDataAnalysisExporter(self.mock_app_config, self.mock_s3_handler)
 
@@ -35,22 +36,22 @@ class TestCoingeckoSimilarExchangesDataAnalysisExporter(unittest.TestCase):
         )
 
         self.mock_s3_handler.upload_file.assert_any_call(
-            os.path.join("./", "output", "data", "analyzed", "exchange_table.csv"),
+            os.path.join("./", "output", "data", "analyzed", "2024", "05", "07", "exchange_table.csv"),
             "coingecko/analyzed/exchange_table.csv"
         )
         self.mock_s3_handler.upload_file.assert_any_call(
-            os.path.join("./", "output", "data", "analyzed", "shared_markets_table.csv"),
+            os.path.join("./", "output", "data", "analyzed", "2024", "05", "07", "shared_markets_table.csv"),
             "coingecko/analyzed/shared_markets_table.csv"
         )
         self.mock_s3_handler.upload_file.assert_any_call(
-            os.path.join("./", "output", "data", "analyzed", "markets_historical_volume_df.csv"),
+            os.path.join("./", "output", "data", "analyzed", "2024", "05", "07", "markets_historical_volume_df.csv"),
             "coingecko/analyzed/markets_historical_volume_df.csv"
         )
         self.mock_s3_handler.upload_file.assert_any_call(
-            os.path.join("./", "output", "data", "analyzed", "exchanges_historical_trade_volume.csv"),
+            os.path.join("./", "output", "data", "analyzed", "2024", "05", "07", "exchanges_historical_trade_volume.csv"),
             "coingecko/analyzed/exchanges_historical_trade_volume.csv"
         )
-        mock_makedirs.assert_called_once_with(os.path.join("./", "output", "data", "analyzed"), exist_ok=True)
+        mock_makedirs.assert_called_once_with(os.path.join("./", "output", "data", "analyzed", "2024", "05", "07"), exist_ok=True)
         self.assertEqual(mock_to_csv.call_count, 4)
 
     @patch("os.makedirs")
@@ -71,7 +72,7 @@ class TestCoingeckoSimilarExchangesDataAnalysisExporter(unittest.TestCase):
         )
 
         self.mock_s3_handler.upload_file.assert_not_called()
-        mock_makedirs.assert_called_once_with(os.path.join("./", "output", "data", "analyzed"), exist_ok=True)
+        mock_makedirs.assert_called_once_with(os.path.join("./", "output", "data", "analyzed", "2024", "05", "07"), exist_ok=True)
         self.assertEqual(mock_to_csv.call_count, 4)
 
 if __name__ == "__main__":

@@ -16,6 +16,8 @@ class TestCoingeckoSimilarExchangesDataPipeline(unittest.TestCase):
             exchanges_to_analyze_limit=10,
             write_to_s3=True
         )
+        self.mock_app_config.set_logical_date("2024", "05", "07")
+        
         self.mock_data_analyzer = MagicMock(spec=CoingeckoSimilarExchangesDataAnalyzer)
         self.mock_data_exporter = MagicMock(spec=CoingeckoSimilarExchangesDataAnalysisExporter)
         self.pipeline = CoingeckoSimilarExchangesDataPipeline(

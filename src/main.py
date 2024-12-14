@@ -8,6 +8,7 @@ from src.constants.constants import *
 from src.di.di_container import DIContainer
 from src.config.app_config import AppConfig
 from src.utils.app_config_utils import AppConfigUtils
+from datetime import datetime
 
 def parse_args():
     # Create the parser
@@ -31,39 +32,48 @@ def parse_args():
 
     parser.add_argument("--config", type=str, default="", help="Config file with all configs (overrides previous args)") 
 
+    parser.add_argument("--logical_date", type=str, default="", help="Logical date of the execution in the format YYYY-mm-dd (default: system current datetime)") 
+
     return parser.parse_args()
 
-def create_config_from_args(args):
+def create_app_config(args):
     # If --config is provided, load settings from the file and override other arguments
     if args.config and args.config != "":
         try:
             with open(args.config, 'r') as f:
                 config_args = json.load(f)
+                
                 return AppConfigUtils.from_json(config_args)
         except Exception as e:
             print(f"Error loading configuration file: {e}", file=sys.stderr)
             sys.exit(1)
     else:
-        return AppConfig( \
-            rate_limiter_max_retries=args.rate_limiter_max_retries, \
-            historical_data_lookback_days=args.historical_data_lookback_days, \
-            log_level=args.log_level, \
-            exchanges_with_similar_trades_to_analyze=args.exchanges_with_similar_trades_to_analyze, \
-            exchanges_to_analyze_limit=args.exchanges_to_analyze_limit, \
-            write_to_s3=args.write_to_s3 \
-        )
-    
+        return AppConfigUtils.from_args(args)
+
 if __name__ == "__main__":
     # Read args & app config
     args = parse_args()
-    app_config = create_config_from_args(args)
+
+    # Get app config
+    app_config = create_app_config(args)
 
     # Set log levels
     logging.basicConfig(level=getattr(logging, app_config.log_level.upper(), LOGGING_DEFAULT_LEVEL)) 
 
-    # Init dependencies
-    di_container = DIContainer(app_config)
-    di_container.init_deps()
+    logger = logging.getLogger("__main__")
+    logger.info("Running App main")
+    
+    try:
+        # Init dependencies
+        logger.info("Initiating DI Container")
+        di_container = DIContainer(app_config)
+        di_container.init_deps()
 
-    # Run app 
-    di_container.coingecko_similar_exchanges_data_pipeline.run()
+        # Run app 
+        logger.info("Running coingecko_similar_exchanges_data_pipeline")
+        di_container.coingecko_similar_exchanges_data_pipeline.run()
+    except Exception as e:
+        # Log the exception
+        logging.error("An error occurred while running main entry point", exc_info=True)
+
+    
