@@ -3,11 +3,13 @@ import boto3
 import logging
 from src.adapters.coingecko_api import CoingeckoAPI
 from src.core.coingecko.coingecko_similar_exchanges_data_pipeline import CoingeckoSimilarExchangesDataPipeline
-from src.core.coingecko.coingecko_data_analyzer import CoingeckoDataAnalyzer
+from src.core.coingecko.coingecko_data_analyzer import CoingeckoSimilarExchangesDataAnalyzer
 from src.core.coingecko.coingecko_data_analyzer import CoingeckoDataFetcherLimits
+from src.core.coingecko.coingecko_similar_exchanges_analysis_exporter import CoingeckoSimilarExchangesDataAnalysisExporter
 from src.adapters.s3_handler import S3Handler
 from src.constants.constants import AWS_REQUIRED_CONFIGS
 from src.config.app_config import AppConfig
+
 
 class DIContainer:
     def __init__(self, app_config: AppConfig):
@@ -46,8 +48,13 @@ class DIContainer:
             self.s3_client = None
             self.s3_handler = None
 
+        self.logger.info("Initializing CoingeckoDataAnalysisExporter...")
+        self.coingecko_data_analysis_exporter = CoingeckoSimilarExchangesDataAnalysisExporter( \
+            self.app_config, self.s3_handler)
+        self.logger.info("CoingeckoDataAnalysisExporter initialized succesfully.")   
+
         self.logger.info("Initializing CoingeckoDataAnalyzer...")
-        self.coingecko_data_analyzer = CoingeckoDataAnalyzer(self.coingecko_api, \
+        self.coingecko_data_analyzer = CoingeckoSimilarExchangesDataAnalyzer(self.coingecko_api, \
                                                 CoingeckoDataFetcherLimits( \
                                                    self.app_config.exchanges_with_similar_trades_to_analyze, \
                                                     self.app_config.exchanges_to_analyze_limit \
@@ -55,10 +62,9 @@ class DIContainer:
         self.logger.info("CoingeckoDataAnalyzer initialized succesfully.")        
 
         self.logger.info("Initializing CoingeckoSimilarExchangesDataPipeline...")
-        self.exchanges_analyzer = CoingeckoSimilarExchangesDataPipeline(self.coingecko_api,
-                                                                        self.coingecko_data_analyzer,
-                                                                        self.s3_handler,
-                                                                        app_config=self.app_config)
+        self.coingecko_similar_exchanges_data_pipeline = CoingeckoSimilarExchangesDataPipeline(self.coingecko_data_analyzer,
+                                                                        self.coingecko_data_analysis_exporter,
+                                                                        self.app_config)
         self.logger.info("CoingeckoSimilarExchangesDataPipeline initialized succesfully.")        
 
     def validate_aws_config(self):

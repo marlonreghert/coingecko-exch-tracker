@@ -7,6 +7,7 @@ from src.core.coingecko.coingecko_similar_exchanges_data_pipeline import Coingec
 from src.constants.constants import *
 from src.di.di_container import DIContainer
 from src.config.app_config import AppConfig
+from src.utils.app_config_utils import AppConfigUtils
 
 def parse_args():
     # Create the parser
@@ -38,7 +39,7 @@ def create_config_from_args(args):
         try:
             with open(args.config, 'r') as f:
                 config_args = json.load(f)
-                return AppConfig(config_args)
+                return AppConfigUtils.from_json(config_args)
         except Exception as e:
             print(f"Error loading configuration file: {e}", file=sys.stderr)
             sys.exit(1)
@@ -65,4 +66,4 @@ if __name__ == "__main__":
     di_container.init_deps()
 
     # Run app 
-    di_container.exchanges_analyzer.run()
+    di_container.coingecko_similar_exchanges_data_pipeline.run()

@@ -5,7 +5,7 @@ import logging
 
 HISTORICAL_VOLUME_DATE_FORMAT = '%Y-%m-%d'
 
-class CoingeckoDataAnalyzer:
+class CoingeckoSimilarExchangesDataAnalyzer:
     '''
         Fetches data from Coingecko API as dataframes.
         Accepts limits for the amount of data fetched
@@ -19,7 +19,7 @@ class CoingeckoDataAnalyzer:
         self.logger = logging.getLogger(self.__class__.__name__)
 
 
-    def fetch_exchanges_with_similar_trades(self, bitso_markets):
+    def generate_exchanges_with_similar_trades(self, bitso_markets):
         exchanges = self.coingecko_api.fetch_exchanges()
         shared_markets = []
         similar_exchanges = []
@@ -64,7 +64,7 @@ class CoingeckoDataAnalyzer:
         return (similar_exchanges, \
             shared_markets)
 
-    def fetch_markets_historical_volume_table(self, shared_markets):
+    def generate_markets_historical_volume_table(self, shared_markets):
         historical_volume = []
         markets_processed = set()
 
@@ -94,7 +94,7 @@ class CoingeckoDataAnalyzer:
                 
         return historical_volume
     
-    def fetch_exchange_trade_volume(self, exchanges, days):
+    def generate_exchanges_trade_volume(self, exchanges, days):
         today_date = datetime.utcnow().strftime(HISTORICAL_VOLUME_DATE_FORMAT)
         volume_table = []
 

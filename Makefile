@@ -1,34 +1,58 @@
 # Variables
-PYTHONPATH=src
-TEST_CMD=python -m unittest discover -s tests -p "test_*.py"
-RUN_CMD=python -m src.table_updater
-DOCKER_IMAGE=exchtracker
-DOCKER_CONTAINER=exchtracker_container
+DOCKER_COMPOSE_FILE = docker-compose.yml
+PYTHON_MAIN = src/main.py
+TEST_DIR = tests
+DOCKER_PYTHON_APP = python_app_container
+
+# Default target
+.PHONY: help
+help:
+	@echo "Usage:"
+	@echo "  make build            Build the Docker containers"
+	@echo "  make up               Start the Docker containers"
+	@echo "  make down             Stop and remove the Docker containers"
+	@echo "  make logs             View logs from the Docker containers"
+	@echo "  make tests            Run tests locally"
+	@echo "  make run-local        Run the main application locally"
+	@echo "  make run-docker       Run the main application in Docker"
+	@echo "  make clean            Remove all Docker containers and volumes"
+
+# Build Docker containers
+.PHONY: build
+build:
+	docker-compose -f $(DOCKER_COMPOSE_FILE) build
+
+# Start Docker containers
+.PHONY: up
+up:
+	docker-compose -f $(DOCKER_COMPOSE_FILE) up -d
+
+# Stop Docker containers
+.PHONY: down
+down:
+	docker-compose -f $(DOCKER_COMPOSE_FILE) down
+
+# View logs
+.PHONY: logs
+logs:
+	docker-compose -f $(DOCKER_COMPOSE_FILE) logs -f
 
 # Run tests locally
-test:
-	PYTHONPATH=$(PYTHONPATH) $(TEST_CMD)
+.PHONY: tests
+tests:
+	python -m unittest discover $(TEST_DIR)
 
-# Run the application locally
-run:
-	PYTHONPATH=$(PYTHONPATH) $(RUN_CMD)
+# Run the main application locally
+.PHONY: run-local
+run-local:
+	python $(PYTHON_MAIN)
 
-# Build Docker image
-docker-build:
-	docker build -t $(DOCKER_IMAGE) .
+# Run the main application in Docker
+.PHONY: run-docker
+run-docker:
+	docker exec $(DOCKER_PYTHON_APP) python $(PYTHON_MAIN)
 
-# Run Docker container
-docker-run:
-	docker run --name $(DOCKER_CONTAINER) -v $(PWD)/data:/data -d $(DOCKER_IMAGE)
-
-# Enter the Docker container
-docker-shell:
-	docker exec -it $(DOCKER_CONTAINER) /bin/bash
-
-# View /data/processed folder inside the Docker container
-view-processed:
-	docker exec -it $(DOCKER_CONTAINER) ls /data/processed
-
-# Stop and remove the Docker container
-docker-clean:
-	docker stop $(DOCKER_CONTAINER) && docker rm $(DOCKER_CONTAINER)
+# Clean up Docker containers and volumes
+.PHONY: clean
+clean:
+	docker-compose -f $(DOCKER_COMPOSE_FILE) down --volumes --remove-orphans

@@ -1,7 +1,7 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta
-from src.core.coingecko.coingecko_data_analyzer import CoingeckoDataAnalyzer
+from src.core.coingecko.coingecko_data_analyzer import CoingeckoSimilarExchangesDataAnalyzer
 from src.core.coingecko.coingecko_data_fetcher_limits import CoingeckoDataFetcherLimits
 from src.external_apis.coingecko_api import CoingeckoAPI
 from src.adapters.bitso_api import BitsoAPI
@@ -24,7 +24,7 @@ def fetch_coingecko_data():
 
     # Initialize dependencies
     coingecko_api = CoingeckoAPI(rate_limiter_retries=args["coingecko_retries"])
-    coingecko_data_fetcher = CoingeckoDataAnalyzer(
+    coingecko_data_fetcher = CoingeckoSimilarExchangesDataAnalyzer(
         coingecko_api,
         CoingeckoDataFetcherLimits(
             args["exchanges_with_similar_trades_limit"],
@@ -35,11 +35,11 @@ def fetch_coingecko_data():
 
     # Fetch data
     bitso_markets = bitso_api.fetch_markets()
-    exchanges_with_similar_markets, shared_markets = coingecko_data_fetcher.fetch_exchanges_with_similar_trades(
+    exchanges_with_similar_markets, shared_markets = coingecko_data_fetcher.generate_exchanges_with_similar_trades(
         bitso_markets
     )
-    markets_historical_volume = coingecko_data_fetcher.fetch_markets_historical_volume_table(shared_markets)
-    exchanges_historical_trade_volume = coingecko_data_fetcher.fetch_exchange_trade_volume(
+    markets_historical_volume = coingecko_data_fetcher.generate_markets_historical_volume_table(shared_markets)
+    exchanges_historical_trade_volume = coingecko_data_fetcher.generate_exchanges_trade_volume(
         exchanges_with_similar_markets, EXCHANGE_VOLUME_TRADE_DAYS
     )
 

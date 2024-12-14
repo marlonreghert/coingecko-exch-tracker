@@ -16,7 +16,3 @@ class AppConfig:
         self.exchanges_with_similar_trades_to_analyze = exchanges_with_similar_trades_to_analyze
         self.exchanges_to_analyze_limit = exchanges_to_analyze_limit
         self.write_to_s3 = write_to_s3
-
-
-
-    
