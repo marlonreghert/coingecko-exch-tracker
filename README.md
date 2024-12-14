@@ -34,6 +34,7 @@ ExchTracker is a Python-based data pipeline that leverages the CoinGecko API to 
 
 Start the application and its dependencies (LocalStack) using Docker Compose:
 ```bash
+make build
 make up
 ```
 
