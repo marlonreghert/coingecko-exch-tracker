@@ -178,8 +178,6 @@ This project is licensed under the MIT License.
 
 ## **Contact**
 
-For any issues or suggestions, please reach out to [your-email@example.com].
+For any issues or suggestions, please reach out to [marlonreghert@gmail.com].
 
 ---
-
-This `README.md` is well-organized and includes clear instructions for both Docker-based and local setups, emphasizing the LocalStack web app for S3 exploration and the need for Docker Daemon to be running.
