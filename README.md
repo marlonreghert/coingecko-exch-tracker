@@ -12,7 +12,7 @@ ExchTracker is a Python-based data pipeline that leverages the CoinGecko API to 
   - Analyze trade volume trends for similar exchanges.
 - **Export Results**:
   - Save analyzed data locally as CSV files.
-  - Optionally upload files to S3 for storage or further processing.
+  - Upload files to S3 for storage or further processing (can be disabled)
 - **Configuration**:
   - Flexible configuration through command-line arguments or JSON config files.
 - **Retry Mechanism**:
