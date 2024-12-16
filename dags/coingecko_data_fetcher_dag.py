@@ -12,14 +12,12 @@ import pandas as pd
 # Constants
 EXCHANGE_VOLUME_TRADE_DAYS = 30
 
-# Define the function to be run as the Airflow task
 def fetch_coingecko_data():
-    # Set up arguments (hardcoded for Airflow execution)
     args = {
         "coingecko_retries": 3,
         "exchanges_with_similar_trades_limit": 2,
         "exchanges_to_lookup_limit": 5,
-        "skip_s3_upload": False,  # Set to False to enable S3 uploads
+        "write_to_s3": False,
     }
 
     # Initialize dependencies
@@ -33,7 +31,6 @@ def fetch_coingecko_data():
     )
     bitso_api = BitsoAPI()
 
-    # Fetch data
     bitso_markets = bitso_api.fetch_markets()
     exchanges_with_similar_markets, shared_markets = coingecko_data_fetcher.generate_exchanges_with_similar_trades(
         bitso_markets
@@ -43,7 +40,6 @@ def fetch_coingecko_data():
         exchanges_with_similar_markets, EXCHANGE_VOLUME_TRADE_DAYS
     )
 
-    # Save locally
     os.makedirs("../data/processed", exist_ok=True)
     pd.DataFrame(exchanges_with_similar_markets).to_csv("../data/processed/exchange_table.csv", index=False)
     pd.DataFrame(shared_markets).to_csv("../data/processed/shared_markets_table.csv", index=False)
@@ -79,7 +75,6 @@ with DAG(
     start_date=datetime(2023, 1, 1),
     catchup=False,
 ) as dag:
-    # Define the task
     fetch_data_task = PythonOperator(
         task_id="fetch_coingecko_data",
         python_callable=fetch_coingecko_data,
